@@ -191,4 +191,19 @@
   .cursor-blink::after {
     content: "▊"; animation: blink 1s step-end infinite; margin-left: 2px;
   }
+  .focus-neon:focus-visible {
+    outline: 2px solid var(--neon-cyan);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px oklch(0.8 0.18 200 / 0.25), var(--shadow-neon);
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .skip-link {
+    position: absolute; top: -100px; left: 8px; z-index: 100;
+    padding: 8px 16px; background: var(--neon-green); color: var(--background);
+    font-weight: bold; border-radius: 4px;
+  }
+  .skip-link:focus { top: 8px; }
 }
