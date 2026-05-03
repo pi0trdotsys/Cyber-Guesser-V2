@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { SNIPPETS, type Snippet } from "@/data/snippets";
+import { useSound } from "@/hooks/use-sound";
 
 export const Route = createFileRoute("/")({
   component: Game,
@@ -31,6 +32,7 @@ function Game() {
   const [time, setTime] = useState(ROUND_TIME);
   const [picked, setPicked] = useState<number | null>(null);
   const [hintShown, setHintShown] = useState(false);
+  const sound = useSound();
 
   const current = deck[round];
 
@@ -45,12 +47,14 @@ function Game() {
       lockAnswer(-1);
       return;
     }
+    if (time <= 5) sound.play("tick");
     const t = setTimeout(() => setTime((s) => s - 1), 1000);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [time, phase, picked]);
 
   function start() {
+    sound.play("start");
     setDeck(shuffle(SNIPPETS).slice(0, TOTAL_ROUNDS));
     setRound(0);
     setScore(0);
@@ -72,8 +76,10 @@ function Game() {
       const gained = Math.round((base + timeBonus + streakBonus) * diffMul);
       setScore((s) => s + gained);
       setStreak((s) => s + 1);
+      sound.play("correct");
     } else {
       setStreak(0);
+      sound.play("wrong");
     }
     setPhase("result");
   }
@@ -85,6 +91,7 @@ function Game() {
         setBest(score);
         if (typeof window !== "undefined") localStorage.setItem("cg_best", String(score));
       }
+      sound.play("gameover");
       setPhase("gameover");
       return;
     }
@@ -99,13 +106,45 @@ function Game() {
     if (hintShown || picked !== null) return;
     setHintShown(true);
     setScore((s) => Math.max(0, s - HINT_COST));
+    sound.play("hint");
   }
+
+  // Keyboard shortcuts: 1-4 select option, H = hint, Enter = next, M = mute
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (e.key.toLowerCase() === "m") {
+        sound.toggle();
+        return;
+      }
+      if (phase === "playing" && current && picked === null) {
+        const n = Number(e.key);
+        if (n >= 1 && n <= current.options.length) {
+          sound.play("pick");
+          lockAnswer(n - 1);
+        } else if (e.key.toLowerCase() === "h") {
+          useHint();
+        }
+      } else if (phase === "result" && (e.key === "Enter" || e.key === " ")) {
+        e.preventDefault();
+        next();
+      } else if ((phase === "intro" || phase === "gameover") && (e.key === "Enter" || e.key === " ")) {
+        e.preventDefault();
+        start();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, current, picked, hintShown]);
 
   return (
     <main className="relative min-h-screen overflow-hidden">
+      <a href="#main-content" className="skip-link focus-neon">Skip to main content</a>
       <BackgroundFX />
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-4xl flex-col px-4 py-6 sm:px-6">
-        <Header score={score} streak={streak} best={best} />
+      <div id="main-content" className="relative z-10 mx-auto flex min-h-screen max-w-4xl flex-col px-4 py-6 sm:px-6">
+        <Header score={score} streak={streak} best={best} soundEnabled={sound.enabled} onToggleSound={sound.toggle} />
 
         {phase === "intro" && <Intro onStart={start} best={best} />}
 
@@ -118,7 +157,7 @@ function Game() {
             hintShown={hintShown}
             round={round}
             total={deck.length}
-            onPick={lockAnswer}
+            onPick={(i) => { sound.play("pick"); lockAnswer(i); }}
             onHint={useHint}
             onNext={next}
           />
@@ -155,7 +194,7 @@ function BackgroundFX() {
   );
 }
 
-function Header({ score, streak, best }: { score: number; streak: number; best: number }) {
+function Header({ score, streak, best, soundEnabled, onToggleSound }: { score: number; streak: number; best: number; soundEnabled: boolean; onToggleSound: () => void }) {
   return (
     <header className="mb-6 flex items-center justify-between border-b border-border/60 pb-4">
       <h1 className="font-display text-xl font-black sm:text-2xl">
@@ -163,10 +202,20 @@ function Header({ score, streak, best }: { score: number; streak: number; best: 
         <span className="text-muted-foreground">_</span>
         <span className="text-neon-pink">GUESSER</span>
       </h1>
-      <div className="flex gap-4 text-xs sm:text-sm">
+      <div className="flex items-center gap-4 text-xs sm:text-sm">
         <Stat label="SCORE" value={score} color="text-neon" />
         <Stat label="STREAK" value={`x${streak}`} color="text-neon-pink" />
         <Stat label="BEST" value={best} color="text-neon-cyan" />
+        <button
+          type="button"
+          onClick={onToggleSound}
+          aria-pressed={soundEnabled}
+          aria-label={soundEnabled ? "Mute sound effects (M)" : "Unmute sound effects (M)"}
+          title="Toggle sound (M)"
+          className="focus-neon rounded border border-border/60 px-2 py-1 font-display text-xs text-foreground transition hover:border-neon hover:text-neon"
+        >
+          {soundEnabled ? "🔊 SFX" : "🔇 SFX"}
+        </button>
       </div>
     </header>
   );
@@ -205,13 +254,17 @@ function Intro({ onStart, best }: { onStart: () => void; best: number }) {
 
       <button
         onClick={onStart}
-        className="group relative mt-10 overflow-hidden rounded-md border-2 border-neon bg-primary/10 px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon shadow-neon transition hover:bg-primary hover:text-primary-foreground"
+        autoFocus
+        className="focus-neon group relative mt-10 overflow-hidden rounded-md border-2 border-neon bg-primary/10 px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon shadow-neon transition hover:bg-primary hover:text-primary-foreground"
       >
         <span className="relative z-10">▶ Start_Run</span>
       </button>
 
       <p className="mt-6 text-xs text-muted-foreground">
         Languages: JS · Python · Kotlin · Rust · C · Go · SQL · Bash · TS
+      </p>
+      <p className="mt-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+        Keys: <kbd>1-4</kbd> answer · <kbd>H</kbd> hint · <kbd>Enter</kbd> next · <kbd>M</kbd> mute
       </p>
     </section>
   );
@@ -237,7 +290,7 @@ function GameBoard({
   const timeColor = time > 15 ? "text-neon" : time > 7 ? "text-neon-cyan" : "text-destructive";
 
   return (
-    <section className="flex flex-1 flex-col gap-4">
+    <section className="flex flex-1 flex-col gap-4" aria-live="polite">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">
           ROUND <span className="text-foreground">{round + 1}</span>/{total}
@@ -246,7 +299,7 @@ function GameBoard({
           <Badge>{snippet.language}</Badge>
           <Badge tone={snippet.difficulty}>{snippet.difficulty}</Badge>
         </span>
-        <span className={`font-display font-bold ${timeColor}`}>
+        <span className={`font-display font-bold ${timeColor}`} aria-label={`Time remaining: ${time} seconds`}>
           ⏱ {String(time).padStart(2, "0")}s
         </span>
       </div>
@@ -265,19 +318,20 @@ function GameBoard({
         <button
           onClick={onHint}
           disabled={hintShown || picked !== null}
-          className="shrink-0 rounded border border-secondary/50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-neon-pink transition hover:bg-secondary/10 disabled:opacity-30"
+          aria-label={`Reveal hint, costs ${HINT_COST} points (H)`}
+          className="focus-neon shrink-0 rounded border border-secondary/50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-neon-pink transition hover:bg-secondary/10 disabled:opacity-30"
         >
           ? hint -{HINT_COST}
         </button>
       </div>
 
       {hintShown && (
-        <div className="rounded border border-secondary/40 bg-secondary/5 p-3 text-sm text-neon-pink">
+        <div className="rounded border border-secondary/40 bg-secondary/5 p-3 text-sm text-neon-pink" role="note">
           ▸ {snippet.hint}
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Answer options">
         {snippet.options.map((opt, i) => {
           const isPicked = picked === i;
           const isAnswer = i === snippet.answer;
@@ -292,9 +346,13 @@ function GameBoard({
           return (
             <button
               key={i}
+              type="button"
+              role="radio"
+              aria-checked={isPicked}
+              aria-label={`Option ${i + 1}: ${opt}${reveal && isAnswer ? " (correct)" : ""}`}
               disabled={picked !== null}
               onClick={() => onPick(i)}
-              className={`rounded border-2 p-3 text-left text-sm transition ${cls}`}
+              className={`focus-neon rounded border-2 p-3 text-left text-sm transition ${cls}`}
             >
               <span className="mr-2 font-bold text-muted-foreground">[{String.fromCharCode(65 + i)}]</span>
               {opt}
@@ -304,14 +362,15 @@ function GameBoard({
       </div>
 
       {phase === "result" && (
-        <div className={`rounded border-2 p-4 ${correct ? "border-neon bg-primary/10" : "border-destructive bg-destructive/10"}`}>
+        <div role="status" aria-live="assertive" className={`rounded border-2 p-4 ${correct ? "border-neon bg-primary/10" : "border-destructive bg-destructive/10"}`}>
           <div className={`font-display text-lg font-bold ${correct ? "text-neon" : "text-destructive"}`}>
             {correct ? "✓ ACCESS GRANTED" : "✗ ACCESS DENIED"}
           </div>
           <p className="mt-1 text-sm text-muted-foreground">{snippet.explanation}</p>
           <button
             onClick={onNext}
-            className="mt-3 rounded border border-neon bg-primary/10 px-6 py-2 font-display text-sm font-bold uppercase tracking-wider text-neon transition hover:bg-primary hover:text-primary-foreground"
+            autoFocus
+            className="focus-neon mt-3 rounded border border-neon bg-primary/10 px-6 py-2 font-display text-sm font-bold uppercase tracking-wider text-neon transition hover:bg-primary hover:text-primary-foreground"
           >
             {round + 1 >= total ? "Finish ▸" : "Next ▸"}
           </button>
@@ -388,7 +447,8 @@ function GameOver({ score, best, onRestart }: { score: number; best: number; onR
 
       <button
         onClick={onRestart}
-        className="mt-10 rounded-md border-2 bg-secondary/10 px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon-pink shadow-pink transition hover:bg-secondary hover:text-secondary-foreground"
+        autoFocus
+        className="focus-neon mt-10 rounded-md border-2 bg-secondary/10 px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon-pink shadow-pink transition hover:bg-secondary hover:text-secondary-foreground"
         style={{ borderColor: "var(--neon-pink)" }}
       >
         ▶ Run_Again
