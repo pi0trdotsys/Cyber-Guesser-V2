@@ -132,6 +132,9 @@ function Game() {
       } else if ((phase === "intro" || phase === "gameover") && (e.key === "Enter" || e.key === " ")) {
         e.preventDefault();
         start();
+      } else if (phase === "gameover" && e.key.toLowerCase() === "r") {
+        e.preventDefault();
+        start();
       }
     }
     window.addEventListener("keydown", onKey);
@@ -453,6 +456,9 @@ function GameOver({ score, best, onRestart }: { score: number; best: number; onR
       >
         ▶ Run_Again
       </button>
+      <p className="mt-4 text-[10px] uppercase tracking-widest text-muted-foreground">
+        Press <kbd>R</kbd> or <kbd>Enter</kbd> to restart
+      </p>
     </section>
   );
 }
