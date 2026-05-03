@@ -132,6 +132,9 @@ function Game() {
       } else if ((phase === "intro" || phase === "gameover") && (e.key === "Enter" || e.key === " ")) {
         e.preventDefault();
         start();
+      } else if (phase === "gameover" && e.key.toLowerCase() === "r") {
+        e.preventDefault();
+        start();
       }
     }
     window.addEventListener("keydown", onKey);
