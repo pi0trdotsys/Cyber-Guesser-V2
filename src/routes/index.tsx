@@ -266,9 +266,6 @@ function Intro({ onStart, best }: { onStart: () => void; best: number }) {
       <p className="mt-6 text-xs text-muted-foreground">
         Languages: JS · Python · Kotlin · Rust · C · Go · SQL · Bash · TS
       </p>
-      <p className="mt-2 text-[10px] uppercase tracking-widest text-muted-foreground">
-        Keys: <kbd>1-4</kbd> answer · <kbd>H</kbd> hint · <kbd>Enter</kbd> next · <kbd>M</kbd> mute
-      </p>
     </section>
   );
 }
