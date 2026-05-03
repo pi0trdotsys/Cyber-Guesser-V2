@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { Volume2, VolumeX, RotateCcw, X } from "lucide-react";
 import { SNIPPETS, type Snippet } from "@/data/snippets";
 import { useSound } from "@/hooks/use-sound";
 
@@ -63,6 +64,16 @@ function Game() {
     setPicked(null);
     setHintShown(false);
     setPhase("playing");
+  }
+
+  function exitToMenu() {
+    setPhase("intro");
+    setPicked(null);
+    setHintShown(false);
+    setTime(ROUND_TIME);
+    setRound(0);
+    setScore(0);
+    setStreak(0);
   }
 
   function lockAnswer(idx: number) {
@@ -147,7 +158,16 @@ function Game() {
       <a href="#main-content" className="skip-link focus-neon">Skip to main content</a>
       <BackgroundFX />
       <div id="main-content" className="relative z-10 mx-auto flex min-h-screen max-w-4xl flex-col px-4 py-6 sm:px-6">
-        <Header score={score} streak={streak} best={best} soundEnabled={sound.enabled} onToggleSound={sound.toggle} />
+        <Header
+          score={score}
+          streak={streak}
+          best={best}
+          soundEnabled={sound.enabled}
+          onToggleSound={sound.toggle}
+          inSession={phase !== "intro" && phase !== "gameover"}
+          onRestart={start}
+          onExit={exitToMenu}
+        />
 
         {phase === "intro" && <Intro onStart={start} best={best} />}
 
