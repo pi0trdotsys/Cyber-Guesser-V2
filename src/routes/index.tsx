@@ -456,6 +456,9 @@ function GameOver({ score, best, onRestart }: { score: number; best: number; onR
       >
         ▶ Run_Again
       </button>
+      <p className="mt-4 text-[10px] uppercase tracking-widest text-muted-foreground">
+        Press <kbd>R</kbd> or <kbd>Enter</kbd> to restart
+      </p>
     </section>
   );
 }
