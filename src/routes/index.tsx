@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { Volume2, VolumeX, RotateCcw, X } from "lucide-react";
 import { SNIPPETS, type Snippet } from "@/data/snippets";
 import { useSound } from "@/hooks/use-sound";
 
@@ -63,6 +64,16 @@ function Game() {
     setPicked(null);
     setHintShown(false);
     setPhase("playing");
+  }
+
+  function exitToMenu() {
+    setPhase("intro");
+    setPicked(null);
+    setHintShown(false);
+    setTime(ROUND_TIME);
+    setRound(0);
+    setScore(0);
+    setStreak(0);
   }
 
   function lockAnswer(idx: number) {
@@ -135,6 +146,12 @@ function Game() {
       } else if (phase === "gameover" && e.key.toLowerCase() === "r") {
         e.preventDefault();
         start();
+      } else if ((phase === "playing" || phase === "result") && e.key.toLowerCase() === "r") {
+        e.preventDefault();
+        start();
+      } else if ((phase === "playing" || phase === "result") && e.key === "Escape") {
+        e.preventDefault();
+        exitToMenu();
       }
     }
     window.addEventListener("keydown", onKey);
@@ -147,7 +164,16 @@ function Game() {
       <a href="#main-content" className="skip-link focus-neon">Skip to main content</a>
       <BackgroundFX />
       <div id="main-content" className="relative z-10 mx-auto flex min-h-screen max-w-4xl flex-col px-4 py-6 sm:px-6">
-        <Header score={score} streak={streak} best={best} soundEnabled={sound.enabled} onToggleSound={sound.toggle} />
+        <Header
+          score={score}
+          streak={streak}
+          best={best}
+          soundEnabled={sound.enabled}
+          onToggleSound={sound.toggle}
+          inSession={phase !== "intro" && phase !== "gameover"}
+          onRestart={start}
+          onExit={exitToMenu}
+        />
 
         {phase === "intro" && <Intro onStart={start} best={best} />}
 
@@ -197,7 +223,7 @@ function BackgroundFX() {
   );
 }
 
-function Header({ score, streak, best, soundEnabled, onToggleSound }: { score: number; streak: number; best: number; soundEnabled: boolean; onToggleSound: () => void }) {
+function Header({ score, streak, best, soundEnabled, onToggleSound, inSession, onRestart, onExit }: { score: number; streak: number; best: number; soundEnabled: boolean; onToggleSound: () => void; inSession: boolean; onRestart: () => void; onExit: () => void }) {
   return (
     <header className="mb-6 flex items-center justify-between border-b border-border/60 pb-4">
       <h1 className="font-display text-xl font-black sm:text-2xl">
@@ -209,18 +235,53 @@ function Header({ score, streak, best, soundEnabled, onToggleSound }: { score: n
         <Stat label="SCORE" value={score} color="text-neon" />
         <Stat label="STREAK" value={`x${streak}`} color="text-neon-pink" />
         <Stat label="BEST" value={best} color="text-neon-cyan" />
-        <button
-          type="button"
-          onClick={onToggleSound}
-          aria-pressed={soundEnabled}
-          aria-label={soundEnabled ? "Mute sound effects (M)" : "Unmute sound effects (M)"}
-          title="Toggle sound (M)"
-          className="focus-neon rounded border border-border/60 px-2 py-1 font-display text-xs text-foreground transition hover:border-neon hover:text-neon"
-        >
-          {soundEnabled ? "🔊 SFX" : "🔇 SFX"}
-        </button>
+        <div className="flex items-center gap-1.5">
+          <IconBtn
+            onClick={onToggleSound}
+            ariaLabel={soundEnabled ? "Mute sound effects (M)" : "Unmute sound effects (M)"}
+            title="Toggle sound (M)"
+            ariaPressed={soundEnabled}
+            tone="cyan"
+          >
+            {soundEnabled ? <Volume2 size={16} strokeWidth={2} /> : <VolumeX size={16} strokeWidth={2} />}
+          </IconBtn>
+          {inSession && (
+            <>
+              <IconBtn onClick={onRestart} ariaLabel="Restart session (R)" title="Restart (R)" tone="green">
+                <RotateCcw size={16} strokeWidth={2} />
+              </IconBtn>
+              <IconBtn onClick={onExit} ariaLabel="Exit to main menu (Esc)" title="Exit (Esc)" tone="pink">
+                <X size={16} strokeWidth={2} />
+              </IconBtn>
+            </>
+          )}
+        </div>
       </div>
     </header>
+  );
+}
+
+function IconBtn({
+  children, onClick, ariaLabel, title, ariaPressed, tone = "cyan",
+}: {
+  children: React.ReactNode; onClick: () => void; ariaLabel: string; title: string;
+  ariaPressed?: boolean; tone?: "cyan" | "green" | "pink";
+}) {
+  const hover =
+    tone === "green" ? "hover:border-neon hover:text-neon hover:shadow-neon"
+    : tone === "pink" ? "hover:border-[var(--neon-pink)] hover:text-neon-pink hover:shadow-pink"
+    : "hover:border-[var(--neon-cyan)] hover:text-neon-cyan";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={ariaLabel}
+      aria-pressed={ariaPressed}
+      title={title}
+      className={`focus-neon inline-flex h-8 w-8 items-center justify-center rounded border border-border/60 bg-card/40 text-muted-foreground backdrop-blur transition ${hover}`}
+    >
+      {children}
+    </button>
   );
 }
 
