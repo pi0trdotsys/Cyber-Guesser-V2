@@ -33,6 +33,7 @@ function Game() {
   const [time, setTime] = useState(ROUND_TIME);
   const [picked, setPicked] = useState<number | null>(null);
   const [hintShown, setHintShown] = useState(false);
+  const [confirmExit, setConfirmExit] = useState(false);
   const sound = useSound();
 
   const current = deck[round];
@@ -74,6 +75,15 @@ function Game() {
     setRound(0);
     setScore(0);
     setStreak(0);
+    setConfirmExit(false);
+  }
+
+  function requestExit() {
+    if (phase === "intro" || phase === "gameover") {
+      exitToMenu();
+      return;
+    }
+    setConfirmExit(true);
   }
 
   function lockAnswer(idx: number) {
@@ -151,13 +161,14 @@ function Game() {
         start();
       } else if ((phase === "playing" || phase === "result") && e.key === "Escape") {
         e.preventDefault();
-        exitToMenu();
+        if (confirmExit) setConfirmExit(false);
+        else requestExit();
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, current, picked, hintShown]);
+  }, [phase, current, picked, hintShown, confirmExit]);
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -172,7 +183,7 @@ function Game() {
           onToggleSound={sound.toggle}
           inSession={phase !== "intro" && phase !== "gameover"}
           onRestart={start}
-          onExit={exitToMenu}
+          onExit={requestExit}
         />
 
         {phase === "intro" && <Intro onStart={start} best={best} />}
@@ -194,10 +205,13 @@ function Game() {
 
         {phase === "gameover" && <GameOver score={score} best={best} onRestart={start} />}
 
-        <footer className="mt-auto pt-8 text-center text-xs text-muted-foreground">
-          <span className="text-neon">[</span> CYBER-GUESSER <span className="text-neon-pink">v1.0</span> <span className="text-neon">]</span> — decode the matrix
+        <footer className="mt-auto pt-8 text-center text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">
+          cyber_guesser
         </footer>
       </div>
+      {confirmExit && (
+        <ConfirmExit onCancel={() => setConfirmExit(false)} onConfirm={exitToMenu} />
+      )}
     </main>
   );
 }
@@ -285,20 +299,60 @@ function Stat({ label, value, color }: { label: string; value: number | string; 
   );
 }
 
+function ConfirmExit({ onCancel, onConfirm }: { onCancel: () => void; onConfirm: () => void }) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Enter") { e.preventDefault(); onConfirm(); }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onConfirm]);
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-exit-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm"
+      onClick={onCancel}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm rounded-md border border-[var(--neon-pink)]/60 bg-card/95 p-6 text-center"
+      >
+        <h3 id="confirm-exit-title" className="font-display text-lg font-bold text-neon-pink">
+          Exit session?
+        </h3>
+        <p className="mt-2 text-sm text-muted-foreground">Your current run will be lost.</p>
+        <div className="mt-5 flex gap-2">
+          <button
+            onClick={onCancel}
+            autoFocus
+            className="focus-neon flex-1 rounded border border-border/60 px-4 py-2 text-sm font-bold uppercase tracking-wider text-foreground transition hover:border-neon hover:text-neon"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="focus-neon flex-1 rounded border border-[var(--neon-pink)]/70 px-4 py-2 text-sm font-bold uppercase tracking-wider text-neon-pink transition hover:bg-secondary hover:text-secondary-foreground"
+          >
+            Exit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Intro({ onStart, best }: { onStart: () => void; best: number }) {
   return (
     <section className="flex flex-1 flex-col items-center justify-center py-12 text-center">
-      <div className="mb-2 text-xs uppercase tracking-[0.4em] text-neon-cyan glitch-flicker">
-        // initialize_session
-      </div>
       <h2 className="font-display text-4xl font-black leading-tight sm:text-6xl">
         <span className="text-neon">DECODE</span>
         <br />
         <span className="text-foreground">THE CODE.</span>
       </h2>
-      <p className="mt-6 max-w-md text-sm text-muted-foreground sm:text-base">
-        Read the snippet. Predict the output. Beat the timer. Stack your streak.
-        <span className="cursor-blink" />
+      <p className="mt-4 max-w-sm text-sm text-muted-foreground">
+        Read. Predict. Beat the timer.
       </p>
 
       <div className="mt-10 grid w-full max-w-md grid-cols-3 gap-3 text-xs">
@@ -312,12 +366,8 @@ function Intro({ onStart, best }: { onStart: () => void; best: number }) {
         autoFocus
         className="focus-neon group relative mt-10 overflow-hidden rounded-md border border-neon bg-transparent px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon transition hover:bg-primary hover:text-primary-foreground"
       >
-        <span className="relative z-10">▶ Start_Run</span>
+        <span className="relative z-10">▶ Start</span>
       </button>
-
-      <p className="mt-6 text-xs text-muted-foreground">
-        Languages: JS · Python · Kotlin · Rust · C · Go · SQL · Bash · TS
-      </p>
     </section>
   );
 }
@@ -449,12 +499,9 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
   const lines = useMemo(() => code.split("\n"), [code]);
   return (
     <div className="relative overflow-hidden rounded-md border border-border/60 bg-card/60 backdrop-blur">
-      <div className="flex items-center justify-between border-b border-border/40 px-4 py-2">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-          ~/{language.toLowerCase()}
-        </span>
-        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">
-          {language.toLowerCase()}.src
+      <div className="flex items-center justify-end border-b border-border/40 px-4 py-2">
+        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/70">
+          {language.toLowerCase()}
         </span>
       </div>
       <pre className="overflow-x-auto p-4 text-xs leading-relaxed sm:text-sm">
@@ -477,20 +524,16 @@ function GameOver({ score, best, onRestart }: { score: number; best: number; onR
   const newBest = score >= best && score > 0;
   return (
     <section className="flex flex-1 flex-col items-center justify-center py-12 text-center">
-      <div className="mb-2 text-xs uppercase tracking-[0.4em] text-neon-pink glitch-flicker">
-        // session_terminated
-      </div>
-      <h2 className="font-display text-5xl font-black sm:text-7xl">
-        <span className="text-neon-pink">RUN</span>{" "}
+      <h2 className="font-display text-5xl font-black sm:text-6xl">
         <span className="text-foreground">COMPLETE</span>
       </h2>
 
       <div className="mt-8 rounded-md border border-neon/60 bg-card/60 px-12 py-6 backdrop-blur">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground">final_score</div>
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">score</div>
         <div className="font-display text-6xl font-black text-neon">{score}</div>
         {newBest && (
-          <div className="mt-2 text-sm font-bold uppercase tracking-widest text-neon-pink glitch-flicker">
-            ⚡ new personal best
+          <div className="mt-2 text-xs font-bold uppercase tracking-widest text-neon-pink">
+            ⚡ new best
           </div>
         )}
       </div>
@@ -501,11 +544,8 @@ function GameOver({ score, best, onRestart }: { score: number; best: number; onR
         className="focus-neon mt-10 rounded-md border bg-transparent px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon-pink transition hover:bg-secondary hover:text-secondary-foreground"
         style={{ borderColor: "var(--neon-pink)" }}
       >
-        ▶ Run_Again
+        ▶ Play again
       </button>
-      <p className="mt-4 text-[10px] uppercase tracking-widest text-muted-foreground">
-        Press <kbd>R</kbd> or <kbd>Enter</kbd> to restart
-      </p>
     </section>
   );
 }
