@@ -230,16 +230,16 @@ function BackgroundFX() {
 
 function Header({ score, streak, best, soundEnabled, onToggleSound, inSession, onRestart, onExit }: { score: number; streak: number; best: number; soundEnabled: boolean; onToggleSound: () => void; inSession: boolean; onRestart: () => void; onExit: () => void }) {
   return (
-    <header className="mb-6 flex items-center justify-between border-b border-border/60 pb-4">
-      <h1 className="font-display text-xl font-black sm:text-2xl">
+    <header className="mb-6 flex items-center justify-between gap-3 border-b border-border/60 pb-4">
+      <h1 className="font-display text-base font-black sm:text-2xl">
         <span className="text-neon">CYBER</span>
         <span className="text-muted-foreground">_</span>
         <span className="text-neon-pink">GUESSER</span>
       </h1>
-      <div className="flex items-center gap-4 text-xs sm:text-sm">
+      <div className="flex items-center gap-2 text-xs sm:gap-4 sm:text-sm">
         <Stat label="SCORE" value={score} color="text-neon" />
-        <Stat label="STREAK" value={`x${streak}`} color="text-neon-pink" />
-        <Stat label="BEST" value={best} color="text-neon-cyan" />
+        <Stat label="STREAK" value={`x${streak}`} color="text-neon-pink" hideOnMobile={inSession} />
+        <Stat label="BEST" value={best} color="text-neon-cyan" hideOnMobile />
         <div className="flex items-center gap-1.5">
           <IconBtn
             onClick={onToggleSound}
@@ -290,9 +290,9 @@ function IconBtn({
   );
 }
 
-function Stat({ label, value, color }: { label: string; value: number | string; color: string }) {
+function Stat({ label, value, color, hideOnMobile }: { label: string; value: number | string; color: string; hideOnMobile?: boolean }) {
   return (
-    <div className="flex flex-col items-end">
+    <div className={`flex flex-col items-end ${hideOnMobile ? "hidden sm:flex" : ""}`}>
       <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</span>
       <span className={`font-display font-bold ${color}`}>{value}</span>
     </div>
