@@ -204,22 +204,13 @@ function Game() {
 
 function BackgroundFX() {
   return (
-    <>
-      <div
-        className="pointer-events-none fixed inset-0 z-0 opacity-40"
-        style={{
-          background:
-            "radial-gradient(ellipse at 20% 0%, oklch(0.7 0.28 330 / 0.2), transparent 50%), radial-gradient(ellipse at 80% 100%, oklch(0.85 0.25 145 / 0.18), transparent 50%)",
-        }}
-      />
-      <div
-        className="pointer-events-none fixed inset-0 z-0 mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(0deg, transparent 0, transparent 3px, oklch(0 0 0 / 0.25) 3px, oklch(0 0 0 / 0.25) 4px)",
-        }}
-      />
-    </>
+    <div
+      className="pointer-events-none fixed inset-0 z-0 opacity-30"
+      style={{
+        background:
+          "radial-gradient(ellipse at 20% 0%, oklch(0.7 0.28 330 / 0.12), transparent 55%), radial-gradient(ellipse at 80% 100%, oklch(0.85 0.25 145 / 0.10), transparent 55%)",
+      }}
+    />
   );
 }
 
@@ -319,7 +310,7 @@ function Intro({ onStart, best }: { onStart: () => void; best: number }) {
       <button
         onClick={onStart}
         autoFocus
-        className="focus-neon group relative mt-10 overflow-hidden rounded-md border-2 border-neon bg-primary/10 px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon shadow-neon transition hover:bg-primary hover:text-primary-foreground"
+        className="focus-neon group relative mt-10 overflow-hidden rounded-md border border-neon bg-transparent px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon transition hover:bg-primary hover:text-primary-foreground"
       >
         <span className="relative z-10">▶ Start_Run</span>
       </button>
@@ -399,11 +390,11 @@ function GameBoard({
           const reveal = picked !== null;
           const cls = reveal
             ? isAnswer
-              ? "border-neon bg-primary/15 text-neon shadow-neon"
+              ? "border-neon bg-primary/10 text-neon"
               : isPicked
-                ? "border-destructive bg-destructive/10 text-destructive"
-                : "border-border/40 opacity-50"
-            : "border-border hover:border-neon hover:bg-primary/5 hover:shadow-neon";
+                ? "border-destructive bg-destructive/5 text-destructive"
+                : "border-border/30 opacity-40"
+            : "border-border/60 hover:border-neon hover:bg-primary/5";
           return (
             <button
               key={i}
@@ -413,7 +404,7 @@ function GameBoard({
               aria-label={`Option ${i + 1}: ${opt}${reveal && isAnswer ? " (correct)" : ""}`}
               disabled={picked !== null}
               onClick={() => onPick(i)}
-              className={`focus-neon rounded border-2 p-3 text-left text-sm transition ${cls}`}
+              className={`focus-neon rounded border p-3 text-left text-sm transition ${cls}`}
             >
               <span className="mr-2 font-bold text-muted-foreground">[{String.fromCharCode(65 + i)}]</span>
               {opt}
@@ -423,7 +414,7 @@ function GameBoard({
       </div>
 
       {phase === "result" && (
-        <div role="status" aria-live="assertive" className={`rounded border-2 p-4 ${correct ? "border-neon bg-primary/10" : "border-destructive bg-destructive/10"}`}>
+        <div role="status" aria-live="assertive" className={`rounded border p-4 ${correct ? "border-neon bg-primary/5" : "border-destructive bg-destructive/5"}`}>
           <div className={`font-display text-lg font-bold ${correct ? "text-neon" : "text-destructive"}`}>
             {correct ? "✓ ACCESS GRANTED" : "✗ ACCESS DENIED"}
           </div>
@@ -457,14 +448,12 @@ function Badge({ children, tone }: { children: React.ReactNode; tone?: string })
 function CodeBlock({ code, language }: { code: string; language: string }) {
   const lines = useMemo(() => code.split("\n"), [code]);
   return (
-    <div className="scanlines relative overflow-hidden rounded-lg border-2 border-border bg-card/80 shadow-neon backdrop-blur">
-      <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-2">
-        <div className="flex gap-1.5">
-          <span className="h-3 w-3 rounded-full bg-destructive/80" />
-          <span className="h-3 w-3 rounded-full bg-secondary/80" />
-          <span className="h-3 w-3 rounded-full bg-primary/80" />
-        </div>
-        <span className="text-xs uppercase tracking-widest text-muted-foreground">
+    <div className="relative overflow-hidden rounded-md border border-border/60 bg-card/60 backdrop-blur">
+      <div className="flex items-center justify-between border-b border-border/40 px-4 py-2">
+        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+          ~/{language.toLowerCase()}
+        </span>
+        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">
           {language.toLowerCase()}.src
         </span>
       </div>
@@ -496,7 +485,7 @@ function GameOver({ score, best, onRestart }: { score: number; best: number; onR
         <span className="text-foreground">COMPLETE</span>
       </h2>
 
-      <div className="mt-8 rounded-lg border-2 border-neon bg-card/60 px-12 py-6 shadow-neon backdrop-blur">
+      <div className="mt-8 rounded-md border border-neon/60 bg-card/60 px-12 py-6 backdrop-blur">
         <div className="text-xs uppercase tracking-widest text-muted-foreground">final_score</div>
         <div className="font-display text-6xl font-black text-neon">{score}</div>
         {newBest && (
@@ -509,7 +498,7 @@ function GameOver({ score, best, onRestart }: { score: number; best: number; onR
       <button
         onClick={onRestart}
         autoFocus
-        className="focus-neon mt-10 rounded-md border-2 bg-secondary/10 px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon-pink shadow-pink transition hover:bg-secondary hover:text-secondary-foreground"
+        className="focus-neon mt-10 rounded-md border bg-transparent px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon-pink transition hover:bg-secondary hover:text-secondary-foreground"
         style={{ borderColor: "var(--neon-pink)" }}
       >
         ▶ Run_Again
