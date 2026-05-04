@@ -390,11 +390,11 @@ function GameBoard({
           const reveal = picked !== null;
           const cls = reveal
             ? isAnswer
-              ? "border-neon bg-primary/15 text-neon shadow-neon"
+              ? "border-neon bg-primary/10 text-neon"
               : isPicked
-                ? "border-destructive bg-destructive/10 text-destructive"
-                : "border-border/40 opacity-50"
-            : "border-border hover:border-neon hover:bg-primary/5 hover:shadow-neon";
+                ? "border-destructive bg-destructive/5 text-destructive"
+                : "border-border/30 opacity-40"
+            : "border-border/60 hover:border-neon hover:bg-primary/5";
           return (
             <button
               key={i}
@@ -404,7 +404,7 @@ function GameBoard({
               aria-label={`Option ${i + 1}: ${opt}${reveal && isAnswer ? " (correct)" : ""}`}
               disabled={picked !== null}
               onClick={() => onPick(i)}
-              className={`focus-neon rounded border-2 p-3 text-left text-sm transition ${cls}`}
+              className={`focus-neon rounded border p-3 text-left text-sm transition ${cls}`}
             >
               <span className="mr-2 font-bold text-muted-foreground">[{String.fromCharCode(65 + i)}]</span>
               {opt}
@@ -414,7 +414,7 @@ function GameBoard({
       </div>
 
       {phase === "result" && (
-        <div role="status" aria-live="assertive" className={`rounded border-2 p-4 ${correct ? "border-neon bg-primary/10" : "border-destructive bg-destructive/10"}`}>
+        <div role="status" aria-live="assertive" className={`rounded border p-4 ${correct ? "border-neon bg-primary/5" : "border-destructive bg-destructive/5"}`}>
           <div className={`font-display text-lg font-bold ${correct ? "text-neon" : "text-destructive"}`}>
             {correct ? "✓ ACCESS GRANTED" : "✗ ACCESS DENIED"}
           </div>
