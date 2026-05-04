@@ -310,7 +310,7 @@ function Intro({ onStart, best }: { onStart: () => void; best: number }) {
       <button
         onClick={onStart}
         autoFocus
-        className="focus-neon group relative mt-10 overflow-hidden rounded-md border-2 border-neon bg-primary/10 px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon shadow-neon transition hover:bg-primary hover:text-primary-foreground"
+        className="focus-neon group relative mt-10 overflow-hidden rounded-md border border-neon bg-transparent px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon transition hover:bg-primary hover:text-primary-foreground"
       >
         <span className="relative z-10">▶ Start_Run</span>
       </button>
@@ -485,7 +485,7 @@ function GameOver({ score, best, onRestart }: { score: number; best: number; onR
         <span className="text-foreground">COMPLETE</span>
       </h2>
 
-      <div className="mt-8 rounded-lg border-2 border-neon bg-card/60 px-12 py-6 shadow-neon backdrop-blur">
+      <div className="mt-8 rounded-md border border-neon/60 bg-card/60 px-12 py-6 backdrop-blur">
         <div className="text-xs uppercase tracking-widest text-muted-foreground">final_score</div>
         <div className="font-display text-6xl font-black text-neon">{score}</div>
         {newBest && (
@@ -498,7 +498,7 @@ function GameOver({ score, best, onRestart }: { score: number; best: number; onR
       <button
         onClick={onRestart}
         autoFocus
-        className="focus-neon mt-10 rounded-md border-2 bg-secondary/10 px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon-pink shadow-pink transition hover:bg-secondary hover:text-secondary-foreground"
+        className="focus-neon mt-10 rounded-md border bg-transparent px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon-pink transition hover:bg-secondary hover:text-secondary-foreground"
         style={{ borderColor: "var(--neon-pink)" }}
       >
         ▶ Run_Again
