@@ -317,7 +317,7 @@ function ConfirmExit({ onCancel, onConfirm }: { onCancel: () => void; onConfirm:
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-sm rounded-md border border-neon-pink/60 bg-card/95 p-6 text-center"
+        className="w-full max-w-sm rounded-md border border-[var(--neon-pink)]/60 bg-card/95 p-6 text-center"
       >
         <h3 id="confirm-exit-title" className="font-display text-lg font-bold text-neon-pink">
           Exit session?
@@ -333,7 +333,7 @@ function ConfirmExit({ onCancel, onConfirm }: { onCancel: () => void; onConfirm:
           </button>
           <button
             onClick={onConfirm}
-            className="focus-neon flex-1 rounded border border-neon-pink/70 px-4 py-2 text-sm font-bold uppercase tracking-wider text-neon-pink transition hover:bg-secondary hover:text-secondary-foreground"
+            className="focus-neon flex-1 rounded border border-[var(--neon-pink)]/70 px-4 py-2 text-sm font-bold uppercase tracking-wider text-neon-pink transition hover:bg-secondary hover:text-secondary-foreground"
           >
             Exit
           </button>
