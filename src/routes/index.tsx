@@ -524,20 +524,16 @@ function GameOver({ score, best, onRestart }: { score: number; best: number; onR
   const newBest = score >= best && score > 0;
   return (
     <section className="flex flex-1 flex-col items-center justify-center py-12 text-center">
-      <div className="mb-2 text-xs uppercase tracking-[0.4em] text-neon-pink glitch-flicker">
-        // session_terminated
-      </div>
-      <h2 className="font-display text-5xl font-black sm:text-7xl">
-        <span className="text-neon-pink">RUN</span>{" "}
+      <h2 className="font-display text-5xl font-black sm:text-6xl">
         <span className="text-foreground">COMPLETE</span>
       </h2>
 
       <div className="mt-8 rounded-md border border-neon/60 bg-card/60 px-12 py-6 backdrop-blur">
-        <div className="text-xs uppercase tracking-widest text-muted-foreground">final_score</div>
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">score</div>
         <div className="font-display text-6xl font-black text-neon">{score}</div>
         {newBest && (
-          <div className="mt-2 text-sm font-bold uppercase tracking-widest text-neon-pink glitch-flicker">
-            ⚡ new personal best
+          <div className="mt-2 text-xs font-bold uppercase tracking-widest text-neon-pink">
+            ⚡ new best
           </div>
         )}
       </div>
@@ -548,11 +544,8 @@ function GameOver({ score, best, onRestart }: { score: number; best: number; onR
         className="focus-neon mt-10 rounded-md border bg-transparent px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon-pink transition hover:bg-secondary hover:text-secondary-foreground"
         style={{ borderColor: "var(--neon-pink)" }}
       >
-        ▶ Run_Again
+        ▶ Play again
       </button>
-      <p className="mt-4 text-[10px] uppercase tracking-widest text-muted-foreground">
-        Press <kbd>R</kbd> or <kbd>Enter</kbd> to restart
-      </p>
     </section>
   );
 }
