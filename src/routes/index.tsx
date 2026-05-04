@@ -499,12 +499,9 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
   const lines = useMemo(() => code.split("\n"), [code]);
   return (
     <div className="relative overflow-hidden rounded-md border border-border/60 bg-card/60 backdrop-blur">
-      <div className="flex items-center justify-between border-b border-border/40 px-4 py-2">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-          ~/{language.toLowerCase()}
-        </span>
-        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">
-          {language.toLowerCase()}.src
+      <div className="flex items-center justify-end border-b border-border/40 px-4 py-2">
+        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/70">
+          {language.toLowerCase()}
         </span>
       </div>
       <pre className="overflow-x-auto p-4 text-xs leading-relaxed sm:text-sm">
