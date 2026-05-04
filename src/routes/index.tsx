@@ -33,6 +33,7 @@ function Game() {
   const [time, setTime] = useState(ROUND_TIME);
   const [picked, setPicked] = useState<number | null>(null);
   const [hintShown, setHintShown] = useState(false);
+  const [confirmExit, setConfirmExit] = useState(false);
   const sound = useSound();
 
   const current = deck[round];
@@ -74,6 +75,15 @@ function Game() {
     setRound(0);
     setScore(0);
     setStreak(0);
+    setConfirmExit(false);
+  }
+
+  function requestExit() {
+    if (phase === "intro" || phase === "gameover") {
+      exitToMenu();
+      return;
+    }
+    setConfirmExit(true);
   }
 
   function lockAnswer(idx: number) {
@@ -151,13 +161,14 @@ function Game() {
         start();
       } else if ((phase === "playing" || phase === "result") && e.key === "Escape") {
         e.preventDefault();
-        exitToMenu();
+        if (confirmExit) setConfirmExit(false);
+        else requestExit();
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, current, picked, hintShown]);
+  }, [phase, current, picked, hintShown, confirmExit]);
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -172,7 +183,7 @@ function Game() {
           onToggleSound={sound.toggle}
           inSession={phase !== "intro" && phase !== "gameover"}
           onRestart={start}
-          onExit={exitToMenu}
+          onExit={requestExit}
         />
 
         {phase === "intro" && <Intro onStart={start} best={best} />}
@@ -194,10 +205,13 @@ function Game() {
 
         {phase === "gameover" && <GameOver score={score} best={best} onRestart={start} />}
 
-        <footer className="mt-auto pt-8 text-center text-xs text-muted-foreground">
-          <span className="text-neon">[</span> CYBER-GUESSER <span className="text-neon-pink">v1.0</span> <span className="text-neon">]</span> — decode the matrix
+        <footer className="mt-auto pt-8 text-center text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">
+          cyber_guesser
         </footer>
       </div>
+      {confirmExit && (
+        <ConfirmExit onCancel={() => setConfirmExit(false)} onConfirm={exitToMenu} />
+      )}
     </main>
   );
 }
