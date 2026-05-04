@@ -204,22 +204,13 @@ function Game() {
 
 function BackgroundFX() {
   return (
-    <>
-      <div
-        className="pointer-events-none fixed inset-0 z-0 opacity-40"
-        style={{
-          background:
-            "radial-gradient(ellipse at 20% 0%, oklch(0.7 0.28 330 / 0.2), transparent 50%), radial-gradient(ellipse at 80% 100%, oklch(0.85 0.25 145 / 0.18), transparent 50%)",
-        }}
-      />
-      <div
-        className="pointer-events-none fixed inset-0 z-0 mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(0deg, transparent 0, transparent 3px, oklch(0 0 0 / 0.25) 3px, oklch(0 0 0 / 0.25) 4px)",
-        }}
-      />
-    </>
+    <div
+      className="pointer-events-none fixed inset-0 z-0 opacity-30"
+      style={{
+        background:
+          "radial-gradient(ellipse at 20% 0%, oklch(0.7 0.28 330 / 0.12), transparent 55%), radial-gradient(ellipse at 80% 100%, oklch(0.85 0.25 145 / 0.10), transparent 55%)",
+      }}
+    />
   );
 }
 
@@ -457,14 +448,12 @@ function Badge({ children, tone }: { children: React.ReactNode; tone?: string })
 function CodeBlock({ code, language }: { code: string; language: string }) {
   const lines = useMemo(() => code.split("\n"), [code]);
   return (
-    <div className="scanlines relative overflow-hidden rounded-lg border-2 border-border bg-card/80 shadow-neon backdrop-blur">
-      <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-2">
-        <div className="flex gap-1.5">
-          <span className="h-3 w-3 rounded-full bg-destructive/80" />
-          <span className="h-3 w-3 rounded-full bg-secondary/80" />
-          <span className="h-3 w-3 rounded-full bg-primary/80" />
-        </div>
-        <span className="text-xs uppercase tracking-widest text-muted-foreground">
+    <div className="relative overflow-hidden rounded-md border border-border/60 bg-card/60 backdrop-blur">
+      <div className="flex items-center justify-between border-b border-border/40 px-4 py-2">
+        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+          ~/{language.toLowerCase()}
+        </span>
+        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">
           {language.toLowerCase()}.src
         </span>
       </div>
