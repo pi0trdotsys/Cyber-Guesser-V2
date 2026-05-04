@@ -346,17 +346,13 @@ function ConfirmExit({ onCancel, onConfirm }: { onCancel: () => void; onConfirm:
 function Intro({ onStart, best }: { onStart: () => void; best: number }) {
   return (
     <section className="flex flex-1 flex-col items-center justify-center py-12 text-center">
-      <div className="mb-2 text-xs uppercase tracking-[0.4em] text-neon-cyan glitch-flicker">
-        // initialize_session
-      </div>
       <h2 className="font-display text-4xl font-black leading-tight sm:text-6xl">
         <span className="text-neon">DECODE</span>
         <br />
         <span className="text-foreground">THE CODE.</span>
       </h2>
-      <p className="mt-6 max-w-md text-sm text-muted-foreground sm:text-base">
-        Read the snippet. Predict the output. Beat the timer. Stack your streak.
-        <span className="cursor-blink" />
+      <p className="mt-4 max-w-sm text-sm text-muted-foreground">
+        Read. Predict. Beat the timer.
       </p>
 
       <div className="mt-10 grid w-full max-w-md grid-cols-3 gap-3 text-xs">
@@ -370,12 +366,8 @@ function Intro({ onStart, best }: { onStart: () => void; best: number }) {
         autoFocus
         className="focus-neon group relative mt-10 overflow-hidden rounded-md border border-neon bg-transparent px-10 py-4 font-display text-lg font-bold uppercase tracking-widest text-neon transition hover:bg-primary hover:text-primary-foreground"
       >
-        <span className="relative z-10">▶ Start_Run</span>
+        <span className="relative z-10">▶ Start</span>
       </button>
-
-      <p className="mt-6 text-xs text-muted-foreground">
-        Languages: JS · Python · Kotlin · Rust · C · Go · SQL · Bash · TS
-      </p>
     </section>
   );
 }
