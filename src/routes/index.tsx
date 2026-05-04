@@ -299,6 +299,50 @@ function Stat({ label, value, color }: { label: string; value: number | string; 
   );
 }
 
+function ConfirmExit({ onCancel, onConfirm }: { onCancel: () => void; onConfirm: () => void }) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Enter") { e.preventDefault(); onConfirm(); }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onConfirm]);
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-exit-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm"
+      onClick={onCancel}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm rounded-md border border-neon-pink/60 bg-card/95 p-6 text-center"
+      >
+        <h3 id="confirm-exit-title" className="font-display text-lg font-bold text-neon-pink">
+          Exit session?
+        </h3>
+        <p className="mt-2 text-sm text-muted-foreground">Your current run will be lost.</p>
+        <div className="mt-5 flex gap-2">
+          <button
+            onClick={onCancel}
+            autoFocus
+            className="focus-neon flex-1 rounded border border-border/60 px-4 py-2 text-sm font-bold uppercase tracking-wider text-foreground transition hover:border-neon hover:text-neon"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="focus-neon flex-1 rounded border border-neon-pink/70 px-4 py-2 text-sm font-bold uppercase tracking-wider text-neon-pink transition hover:bg-secondary hover:text-secondary-foreground"
+          >
+            Exit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Intro({ onStart, best }: { onStart: () => void; best: number }) {
   return (
     <section className="flex flex-1 flex-col items-center justify-center py-12 text-center">
