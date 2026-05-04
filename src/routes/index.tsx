@@ -290,9 +290,9 @@ function IconBtn({
   );
 }
 
-function Stat({ label, value, color }: { label: string; value: number | string; color: string }) {
+function Stat({ label, value, color, hideOnMobile }: { label: string; value: number | string; color: string; hideOnMobile?: boolean }) {
   return (
-    <div className="flex flex-col items-end">
+    <div className={`flex flex-col items-end ${hideOnMobile ? "hidden sm:flex" : ""}`}>
       <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</span>
       <span className={`font-display font-bold ${color}`}>{value}</span>
     </div>
