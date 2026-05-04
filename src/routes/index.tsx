@@ -466,7 +466,7 @@ function GameBoard({
       {phase === "result" && (
         <div role="status" aria-live="assertive" className={`rounded border p-4 ${correct ? "border-neon bg-primary/5" : "border-destructive bg-destructive/5"}`}>
           <div className={`font-display text-lg font-bold ${correct ? "text-neon" : "text-destructive"}`}>
-            {correct ? "✓ ACCESS GRANTED" : "✗ ACCESS DENIED"}
+            {correct ? "✓ CORRECT" : "✗ INCORRECT"}
           </div>
           <p className="mt-1 text-sm text-muted-foreground">{snippet.explanation}</p>
           <button
