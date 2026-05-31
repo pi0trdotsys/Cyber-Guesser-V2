@@ -6,10 +6,10 @@ Built with React, TypeScript, and Capacitor - runs in the browser and as a nativ
 
 ## Screenshots
 
-<img width="220" alt="Intro screen" src="https://github.com/user-attachments/assets/f9f53657-254c-4693-a21e-ba954360534e" />
-<img width="220" alt="Question screen" src="https://github.com/user-attachments/assets/a325da38-f0ad-4e50-9b81-e12ed8e8be20" />
-<img width="220" alt="Correct answer" src="https://github.com/user-attachments/assets/87b25409-6810-4edf-b68b-7e9aeca42789" />
-<img width="220" alt="Game over" src="https://github.com/user-attachments/assets/5fbd8fd3-26b5-4d65-b33c-d9cc307c8dfd" />
+<img width="340" alt="Intro screen" src="https://github.com/user-attachments/assets/f9f53657-254c-4693-a21e-ba954360534e" />
+<img width="340" alt="Question screen" src="https://github.com/user-attachments/assets/a325da38-f0ad-4e50-9b81-e12ed8e8be20" />
+<img width="340" alt="Correct answer" src="https://github.com/user-attachments/assets/87b25409-6810-4edf-b68b-7e9aeca42789" />
+<img width="340" alt="Game over" src="https://github.com/user-attachments/assets/5fbd8fd3-26b5-4d65-b33c-d9cc307c8dfd" />
 
 ## How it works
 
