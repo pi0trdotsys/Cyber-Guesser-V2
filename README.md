@@ -53,4 +53,4 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE) - © 2026 Piotr Rosiński.
