@@ -275,3 +275,5 @@ export const SNIPPETS: Snippet[] = [
     explanation: "Counts rows where the email column is NULL.",
   },
 ];
+import { NEW_SNIPPETS } from "./new_snippets";
+export const ALL_SNIPPETS: Snippet[] = [...SNIPPETS, ...NEW_SNIPPETS];

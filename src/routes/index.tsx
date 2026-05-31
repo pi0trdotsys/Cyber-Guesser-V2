@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Volume2, VolumeX, RotateCcw, X } from "lucide-react";
-import { SNIPPETS, type Snippet } from "@/data/snippets";
+import { ALL_SNIPPETS, type Snippet } from "@/data/snippets";
 import { useSound } from "@/hooks/use-sound";
 
 export const Route = createFileRoute("/")({
@@ -57,7 +57,7 @@ function Game() {
 
   function start() {
     sound.play("start");
-    setDeck(shuffle(SNIPPETS).slice(0, TOTAL_ROUNDS));
+    setDeck(shuffle(ALL_SNIPPETS).slice(0, TOTAL_ROUNDS));
     setRound(0);
     setScore(0);
     setStreak(0);
@@ -495,8 +495,29 @@ function Badge({ children, tone }: { children: React.ReactNode; tone?: string })
   );
 }
 
+
+import { Highlight, themes } from "prism-react-renderer";
+
+const LANG_MAP: Record<string, string> = {
+  "JavaScript": "javascript",
+  "TypeScript": "typescript",
+  "Python": "python",
+  "C": "c",
+  "C++": "cpp",
+  "SQL": "sql",
+  "Bash": "bash",
+  "CSS": "css",
+  "HTML": "markup",
+  "Rust": "rust",
+  "Go": "go",
+  "Kotlin": "kotlin",
+  "Assembly": "nasm",
+  "VHDL": "vhdl",
+};
+
 function CodeBlock({ code, language }: { code: string; language: string }) {
-  const lines = useMemo(() => code.split("\n"), [code]);
+  const lang = (LANG_MAP[language] ?? "javascript") as Parameters<typeof Highlight>[0]["language"];
+
   return (
     <div className="relative overflow-hidden rounded-md border border-border/60 bg-card/60 backdrop-blur">
       <div className="flex items-center justify-end border-b border-border/40 px-4 py-2">
@@ -504,18 +525,24 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
           {language.toLowerCase()}
         </span>
       </div>
-      <pre className="overflow-x-auto p-4 text-xs leading-relaxed sm:text-sm">
-        <code className="font-mono">
-          {lines.map((line, i) => (
-            <div key={i} className="flex">
-              <span className="mr-4 inline-block w-6 select-none text-right text-muted-foreground/60">
-                {i + 1}
-              </span>
-              <span className="text-foreground">{line || " "}</span>
-            </div>
-          ))}
-        </code>
-      </pre>
+      <Highlight theme={themes.vsDark} code={code} language={lang}>
+        {({ style, tokens, getLineProps, getTokenProps }) => (
+          <pre className="overflow-x-auto p-4 text-xs leading-relaxed sm:text-sm" style={{ ...style, background: "transparent" }}>
+            {tokens.map((line, i) => (
+              <div key={i} {...getLineProps({ line })} className="flex">
+                <span className="mr-4 inline-block w-6 select-none text-right text-muted-foreground/60">
+                  {i + 1}
+                </span>
+                <span>
+                  {line.map((token, key) => (
+                    <span key={key} {...getTokenProps({ token })} />
+                  ))}
+                </span>
+              </div>
+            ))}
+          </pre>
+        )}
+      </Highlight>
     </div>
   );
 }
